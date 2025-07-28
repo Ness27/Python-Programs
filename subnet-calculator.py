@@ -27,7 +27,7 @@ def showResults(theWindow, resultData):
 
     row = 0
     for key, value in resultData.items():
-        displayText = value if not isinstance(value, list) else "\n".join(value[:10])
+        displayText = value if not isinstance(value, list) else "\n".join(value[:20])
         tk.Label(resultWindow, text=f"{key}:").grid(row=row, column=0, sticky="w", padx=5)
         tk.Label(resultWindow, text=displayText).grid(row=row, column=1, sticky="w", padx=5)
         row += 1
@@ -39,11 +39,10 @@ def networkEval(networkBoth, networkHost, networkSub):
         theNetaddr = theNetwork.network.network_address
         logging.info(f"Network address: {theNetaddr}")
         return {
-            "IP Address": str(ipaddress.ip_address(networkBoth)),
             "Network Address": str(theNetwork.network.network_address),
             "Broadcast Address": str(theNetwork.network.broadcast_address),
             "Subnet Mask": str(theNetwork.netmask),
-            "Host Mask": str(theNetwork.hostmask),
+            "Wildcard Mask": str(theNetwork.hostmask),
             "Available Hosts": [str(host) for host in theNetwork.network.hosts()]
         }
     else:
@@ -65,13 +64,13 @@ def windowCreation():
     tk.Label(window, text="Enter the IP and Subnet Mask:").grid(row=2)
     # netAddGrt.pack()
 
-    networkAddress = tk.Entry(window, width=20, justify="left")
+    networkAddress = tk.Entry(window, width=25, justify="left")
     networkAddress.insert(10,'x.x.x.x')
     networkAddress.grid(row=0, column=1)
-    networkSubnet = tk.Entry(window, width=20, justify="left")
+    networkSubnet = tk.Entry(window, width=25, justify="left")
     networkSubnet.insert(10,'255.255.255.0')
     networkSubnet.grid(row=1, column=1)
-    networkBoth = tk.Entry(window, width=20, justify="left")
+    networkBoth = tk.Entry(window, width=25, justify="left")
     networkBoth.insert(10,'10.1.1.1/24')
     networkBoth.grid(row=2, column=1)
 
