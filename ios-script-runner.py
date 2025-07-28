@@ -22,40 +22,27 @@ logging.basicConfig(
     ]
 )
 
-def connectSession(ip, username, password, port, commandsfile):
-    with SSHClient() as client:
-        ## Allows for auto-adding server SSH key on client host - On First Connection
-        client.set_missing_host_key_policy(AutoAddPolicy())
-        try:
-            theIP = format(ipaddress.ip_address(ip))
-            logging.info("Connecting to {} over {} ".format(theIP, port))
+def connectSession(arguments):
+    try:
+        theIP = format(ipaddress.ip_address(arguments['host']))
+        logging.info("Connecting to {} over {} ".format(theIP, arguments['port']))
+        connection = netmiko.ConnectHandler(**arguments)
 
-            file_extension = os.path.splitext(commandsfile)
-            if file_extension[1] == ".txt":
-                client.connect(theIP, username=username, password=password, port=int(port))
-                with open(commandsfile, 'r') as file:
-                    for line in file:
-                        print(line.strip())
-                       # stdin, stdout, stderr = client.exec_command(line.strip())
-                       # print(stdout.read().decode())
-            else:
-                logging.error("The file <{}> is not a .txt file. - Exiting program.".format(commandsfile))
-                exit(1)
-        except SSHException as e:
-            print(e)
-        except ValueError as val:
-            logging.error('{}'.format(val))
-            logging.error("Skipping {}".format(str(val).split(' ')[0]))
-            return None
-        except TimeoutError:
-            logging.error("There was an error: {}".format("TimeoutError"))
-            logging.error("Skipping {}".format(ip))
-            return None
-        except KeyboardInterrupt:
-            logging.exception("User interrupt.")
-            logging.error("There was an error: {}".format("KeyboardInterrupt"))
-            logging.error("Exiting program.")
-            exit(1)
+    except ValueError as val:
+        logging.error('{}'.format(val))
+        logging.error("Skipping {}".format(str(val).split(' ')[0]))
+        return None
+    except TimeoutError:
+        logging.error("There was an error: {}".format("TimeoutError"))
+        logging.error("Skipping {}".format(arguments['host']))
+        return None
+    except KeyboardInterrupt:
+        logging.exception("User interrupt.")
+        logging.error("There was an error: {}".format("KeyboardInterrupt"))
+        logging.error("Exiting program.")
+        exit(1)
+    except netmiko.exceptions.NetMikoTimeoutException as theError:
+        logging.error("There was an error: {}".format(theError))
 
     return None
 
@@ -68,8 +55,13 @@ def main():
 
     commandsToRun = ['do show ip int br']
 
-    deviceInfo = dict(host='10.132.101.252', device_type='cisco_ios', username=input('user:'), password=pwinput.pwinput(prompt="Password: ", mask='*'))
+    deviceInfo = {'host':'10.132.101.252',
+                  'port':'22',
+                  'device_type':'cisco_ios',
+                  'username':input('user:'),
+                  'password':pwinput.pwinput(prompt="Password: ", mask='*')}
 
+    connectSession(deviceInfo)
 
 
     logging.info("Program finished. - Exiting program.")
