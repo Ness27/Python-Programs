@@ -10,6 +10,7 @@ import logging
 import sys
 import tkinter as tk
 import ipaddress
+import time
 
 # ️ Configure logging
 logging.basicConfig(
@@ -31,7 +32,9 @@ def showResults(theWindow, resultData):
         tk.Label(resultWindow, text=f"{key}:").grid(row=row, column=0, sticky="w", padx=5)
         tk.Label(resultWindow, text=displayText).grid(row=row, column=1, sticky="w", padx=5)
         row += 1
-    quitButton = tk.Button(resultWindow, text='Quit', command=resultWindow.destroy)
+        if row > 20:
+            break
+    quitButton = tk.Button(resultWindow, text='Close', bg='darkred',fg='white',command=resultWindow.destroy)
     quitButton.grid(row=row+1, column=1, sticky="w", padx=5)
 
 
@@ -39,6 +42,12 @@ def networkEval(networkBoth):
     theNetwork = ipaddress.ip_interface(networkBoth)
     theNetaddr = theNetwork.network.network_address
     logging.debug(f"Network address: {theNetaddr}")
+    count = 0
+    listofHosts = list(theNetwork.network.hosts())
+    show_Hosts = []
+    while count < 20:
+        show_Hosts.append(str(listofHosts[count]))
+        count += 1
     return {
         "Network Address": str(theNetwork.network.network_address),
         "Broadcast Address": str(theNetwork.network.broadcast_address),
@@ -46,9 +55,9 @@ def networkEval(networkBoth):
         "Wildcard Mask": str(theNetwork.hostmask),
         "Private Network Space": str(theNetwork.is_private),
         "Public Network Space": str(theNetwork.is_global),
-        "Total Number of Hosts": len([str(host) for host in theNetwork.network.hosts()]) + 2,
-        "Number of Usable Hosts": str(len([str(host) for host in theNetwork.network.hosts()])),
-        "Available Hosts": [str(host) for host in theNetwork.network.hosts()]
+        "Total Number of Hosts": str(len(listofHosts)),
+        "Number of Usable Hosts": str(len(listofHosts)),
+        "Available Hosts": show_Hosts
     }
 
 
@@ -57,25 +66,26 @@ def windowCreation():
     window = tk.Tk()
     window.title("Subnet Calculator")
     window.eval('tk::PlaceWindow . center')
-    window.geometry("420x60")
+    window.geometry("420x200")
+    # window.frame()
 
+    theTitle = tk.Label(window, text="Welcome to Subnet Calculator\n")
 
-    greeting = tk.Label(window, text="Welcome to Subnet Calculator\n")
-    # greeting.pack()
-    #
     # tk.Label(window, text="Enter the IP:").grid(row=0)
     # tk.Label(window, text="Enter the subnet:").grid(row=1)
-    tk.Label(window, text="Enter the IP and Subnet Mask:").grid(row=2)
+    enterIP = tk.Label(window, text="Enter the IP and Subnet Mask:",fg='black',justify='left')
 
-    networkBoth = tk.Entry(window, width=25, justify="left")
+    networkBoth = tk.Entry(window, width=25, justify="left", fg="black", bg="lightgrey")
     networkBoth.insert(10,'10.1.1.1/24')
-    networkBoth.grid(row=2, column=1)
 
-    runButton = tk.Button(window, text='Run', command=lambda:showResults(window,networkEval(networkBoth.get())))
-    runButton.grid(row=3, column=0, sticky=tk.W, pady=5, padx=105)
-    quitButton = tk.Button(window, text='Quit', command=window.destroy)
-    quitButton.grid(row=3, column=1, sticky=tk.W, pady=5, padx=15)
+    runButton = tk.Button(window, bg='green',fg='white', text='Run', command=lambda:showResults(window,networkEval(networkBoth.get())))
+    quitButton = tk.Button(window, text='Quit', bg='darkred',fg='white', command=window.destroy)
 
+    theTitle.place(x=125, y=10)
+    enterIP.place(x=50, y=50,width=200)
+    networkBoth.place(x=245, y=50)
+    runButton.place(x=160, y=120, width=100)
+    quitButton.place(x=160, y=145, width=100)
 
     window.mainloop()
 
