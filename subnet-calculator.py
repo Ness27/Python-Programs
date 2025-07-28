@@ -38,7 +38,7 @@ def showResults(theWindow, resultData):
 def networkEval(networkBoth):
     theNetwork = ipaddress.ip_interface(networkBoth)
     theNetaddr = theNetwork.network.network_address
-    logging.info(f"Network address: {theNetaddr}")
+    logging.debug(f"Network address: {theNetaddr}")
     return {
         "Network Address": str(theNetwork.network.network_address),
         "Broadcast Address": str(theNetwork.network.broadcast_address),
@@ -91,7 +91,7 @@ def setup(args):
     elif args.info:
         logging.getLogger().setLevel(logging.INFO)
     else:
-        logging.getLogger().setLevel(logging.INFO)
+        logging.getLogger().setLevel(logging.DEBUG)
     logging.info("Setup complete.")
 
 def main():
@@ -108,7 +108,6 @@ def main():
     args = parser.parse_args()
     setup(args)
     logging.info("Starting main program...")
-    logging.debug("TEST")
     # Core Program Logic Goes HERE
     windowCreation()
     logging.info("Program finished.")
