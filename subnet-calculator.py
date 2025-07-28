@@ -28,7 +28,7 @@ def showResults(theWindow, resultData):
 
     row = 0
     for key, value in resultData.items():
-        displayText = value if not isinstance(value, list) else "\n".join(value[:20])
+        displayText = value if not isinstance(value, list) else "\n".join(value)
         tk.Label(resultWindow, text=f"{key}:").grid(row=row, column=0, sticky="w", padx=5)
         tk.Label(resultWindow, text=displayText).grid(row=row, column=1, sticky="w", padx=5)
         row += 1
@@ -106,6 +106,7 @@ def setup(args):
 
 def main():
     """Main entry point of the script."""
+    startTime = time.perf_counter()
     parser = argparse.ArgumentParser(prog='subnet-calculator.py',
                                      add_help=True,
                                      description='An application for network administrators and engineers to calculator network subnets.',
@@ -118,9 +119,13 @@ def main():
     args = parser.parse_args()
     setup(args)
     logging.info("Starting main program...")
+    setupComplete = time.perf_counter()
+    logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
     # Core Program Logic Goes HERE
     windowCreation()
     logging.info("Program finished.")
+    finalTime = time.perf_counter()
+    logging.info('Total running time: {} seconds.'.format(round(finalTime-startTime,5)))
     logging.shutdown()
 
 if __name__ == "__main__":
