@@ -1,8 +1,8 @@
 """
-Filename: test.py
-Description: Brief overview of what this script does.
+Filename: subnet-calculator.py
+Description: An application for network administrators and engineers to calculator network subnets.
 Author: Hunter R.
-Date: 2025-07-28
+Date: 2025-07-27
 """
 
 import argparse
@@ -32,9 +32,9 @@ def setup(args):
 
 def main():
     """Main entry point of the script."""
-    parser = argparse.ArgumentParser(prog='main-template.py',
+    parser = argparse.ArgumentParser(prog='subnet-calculator.py',
                                      add_help=True,
-                                     description='A Standard Python Template.',
+                                     description='An application for network administrators and engineers to calculator network subnets.',
                                      epilog='\nEnd of the help text.')
     parser.add_argument('-e', '--error', action='store_true',help='Enable ERROR level logging', required=False, default=False, dest='error')
     parser.add_argument('-i', '--info', action='store_true',help='Enable INFO level logging', required=False, default=True, dest='info')
