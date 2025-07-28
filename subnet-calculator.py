@@ -22,14 +22,27 @@ logging.basicConfig(
 def windowCreation():
     window = tk.Tk()
     window.title("Subnet Calculator")
+    window.eval('tk::PlaceWindow . center')
+
     greeting = tk.Label(window, text="Welcome to Subnet Calculator\n")
-    greeting.pack()
-    netAddGrt = tk.Label(window, text="Enter the IP:")
-    netAddGrt.pack()
-    networkAddress = tk.Entry(window, width=80, justify="center")
-    networkAddress.insert(0, "x.x.x.x")
-    networkAddress.pack()
+    # greeting.pack()
+
+    tk.Label(window, text="Enter the IP:").grid(row=0)
+    tk.Label(window, text="Enter the subnet:").grid(row=1)
+    # netAddGrt.pack()
+
+    networkAddress = tk.Entry(window, width=80, justify="left").grid(row=0, column=1)
+    networkSubnet = tk.Entry(window, width=80, justify="left").grid(row=1, column=1)
+    # networkAddress.insert(0, "x.x.x.x")
+    # networkAddress.pack()
+    save_ip = ''
+    # Bind the Return key (Enter) to save_ip
+    # networkAddress.bind("<Return>", save_ip)
+    logging.info('ip is {}'.format(save_ip))
+
     window.mainloop()
+
+
 
 
 def setup(args):
