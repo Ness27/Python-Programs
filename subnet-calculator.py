@@ -9,6 +9,7 @@ import argparse
 import logging
 import sys
 import tkinter as tk
+import ipaddress
 
 # ️ Configure logging
 logging.basicConfig(
@@ -17,6 +18,19 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout)
     ]
 )
+
+def networkEval(arguments):
+    theNetwork = ipaddress.ip_interface(arguments)
+    theNetaddr = theNetwork.network.network_address
+    theBroadcastaddr = theNetwork.network.broadcast_address
+    theHosts = list(theNetwork.network.hosts())
+    theSubnet = theNetwork.netmask
+    theHostmask = theNetwork.hostmask
+
+
+
+
+
 
 
 def windowCreation():
@@ -29,16 +43,23 @@ def windowCreation():
 
     tk.Label(window, text="Enter the IP:").grid(row=0)
     tk.Label(window, text="Enter the subnet:").grid(row=1)
+    tk.Label(window, text="Enter the IP and Subnet Mask:").grid(row=2)
     # netAddGrt.pack()
 
-    networkAddress = tk.Entry(window, width=80, justify="left").grid(row=0, column=1)
-    networkSubnet = tk.Entry(window, width=80, justify="left").grid(row=1, column=1)
-    # networkAddress.insert(0, "x.x.x.x")
-    # networkAddress.pack()
-    save_ip = ''
-    # Bind the Return key (Enter) to save_ip
-    # networkAddress.bind("<Return>", save_ip)
-    logging.info('ip is {}'.format(save_ip))
+    networkAddress = tk.Entry(window, width=80, justify="left")
+    networkAddress.insert(10,'x.x.x.x')
+    networkAddress.grid(row=0, column=1)
+    networkSubnet = tk.Entry(window, width=80, justify="left")
+    networkSubnet.insert(10,'255.255.255.0')
+    networkSubnet.grid(row=1, column=1)
+    networkBoth = tk.Entry(window, width=80, justify="left")
+    networkBoth.insert(10,'10.1.1.1/24')
+    networkBoth.grid(row=2, column=1)
+
+
+
+    tk.Button(window, text='Run', command='command').grid(row=3, column=0, sticky=tk.W, pady=5, padx=5)
+    tk.Button(window, text='Quit', command=window.destroy).grid(row=3, column=1, sticky=tk.W, pady=5, padx=5)
 
     window.mainloop()
 
