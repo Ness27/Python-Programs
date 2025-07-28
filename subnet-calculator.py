@@ -22,8 +22,8 @@ logging.basicConfig(
 def showResults(theWindow, resultData):
     resultWindow = tk.Toplevel()
     resultWindow.title("Network Results")
-    resultWindow.geometry("400x300")
-    theWindow.eval(f'tk::PlaceWindow {str(resultWindow)} widget')
+    resultWindow.geometry("400x500")
+    theWindow.eval(f'tk::PlaceWindow {str(resultWindow)} center')
 
     row = 0
     for key, value in resultData.items():
@@ -43,6 +43,10 @@ def networkEval(networkBoth, networkHost, networkSub):
             "Broadcast Address": str(theNetwork.network.broadcast_address),
             "Subnet Mask": str(theNetwork.netmask),
             "Wildcard Mask": str(theNetwork.hostmask),
+            "Private Network Space": str(theNetwork.is_private),
+            "Public Network Space": str(theNetwork.is_global),
+            "Total Number of Hosts": len([str(host) for host in theNetwork.network.hosts()]) + 2,
+            "Number of Usable Hosts": str(len([str(host) for host in theNetwork.network.hosts()])),
             "Available Hosts": [str(host) for host in theNetwork.network.hosts()]
         }
     else:
