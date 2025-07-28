@@ -19,15 +19,33 @@ logging.basicConfig(
     ]
 )
 
+def showResults(theWindow, resultData):
+    resultWindow = tk.Toplevel()
+    resultWindow.title("Network Results")
+    resultWindow.geometry("400x300")
+    theWindow.eval(f'tk::PlaceWindow {str(resultWindow)} widget')
+
+    row = 0
+    for key, value in resultData.items():
+        displayText = value if not isinstance(value, list) else "\n".join(value[:10])
+        tk.Label(resultWindow, text=f"{key}:").grid(row=row, column=0, sticky="w", padx=5)
+        tk.Label(resultWindow, text=displayText).grid(row=row, column=1, sticky="w", padx=5)
+        row += 1
+
+
 def networkEval(networkBoth, networkHost, networkSub):
     if 'x.x.x.x' in networkHost:
         theNetwork = ipaddress.ip_interface(networkBoth)
         theNetaddr = theNetwork.network.network_address
-        theBroadcastaddr = theNetwork.network.broadcast_address
-        theHosts = list(theNetwork.network.hosts())
-        theSubnet = theNetwork.netmask
-        theHostmask = theNetwork.hostmask
         logging.info(f"Network address: {theNetaddr}")
+        return {
+            "IP Address": str(ipaddress.ip_address(networkBoth)),
+            "Network Address": str(theNetwork.network.network_address),
+            "Broadcast Address": str(theNetwork.network.broadcast_address),
+            "Subnet Mask": str(theNetwork.netmask),
+            "Host Mask": str(theNetwork.hostmask),
+            "Available Hosts": [str(host) for host in theNetwork.network.hosts()]
+        }
     else:
         pass
 
@@ -37,6 +55,7 @@ def windowCreation():
     window = tk.Tk()
     window.title("Subnet Calculator")
     window.eval('tk::PlaceWindow . center')
+
 
     greeting = tk.Label(window, text="Welcome to Subnet Calculator\n")
     # greeting.pack()
@@ -56,7 +75,7 @@ def windowCreation():
     networkBoth.insert(10,'10.1.1.1/24')
     networkBoth.grid(row=2, column=1)
 
-    runButton = tk.Button(window, text='Run', command=lambda:networkEval(networkBoth.get(), networkAddress.get(), networkSubnet.get()))
+    runButton = tk.Button(window, text='Run', command=lambda:showResults(window,networkEval(networkBoth.get(), networkAddress.get(), networkSubnet.get())))
     runButton.grid(row=3, column=0, sticky=tk.W, pady=5, padx=5)
     quitButton = tk.Button(window, text='Quit', command=window.destroy)
     quitButton.grid(row=3, column=1, sticky=tk.W, pady=5, padx=5)
