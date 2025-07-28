@@ -31,26 +31,25 @@ def showResults(theWindow, resultData):
         tk.Label(resultWindow, text=f"{key}:").grid(row=row, column=0, sticky="w", padx=5)
         tk.Label(resultWindow, text=displayText).grid(row=row, column=1, sticky="w", padx=5)
         row += 1
+    quitButton = tk.Button(resultWindow, text='Quit', command=resultWindow.destroy)
+    quitButton.grid(row=row+1, column=1, sticky="w", padx=5)
 
 
-def networkEval(networkBoth, networkHost, networkSub):
-    if 'x.x.x.x' in networkHost:
-        theNetwork = ipaddress.ip_interface(networkBoth)
-        theNetaddr = theNetwork.network.network_address
-        logging.info(f"Network address: {theNetaddr}")
-        return {
-            "Network Address": str(theNetwork.network.network_address),
-            "Broadcast Address": str(theNetwork.network.broadcast_address),
-            "Subnet Mask": str(theNetwork.netmask),
-            "Wildcard Mask": str(theNetwork.hostmask),
-            "Private Network Space": str(theNetwork.is_private),
-            "Public Network Space": str(theNetwork.is_global),
-            "Total Number of Hosts": len([str(host) for host in theNetwork.network.hosts()]) + 2,
-            "Number of Usable Hosts": str(len([str(host) for host in theNetwork.network.hosts()])),
-            "Available Hosts": [str(host) for host in theNetwork.network.hosts()]
-        }
-    else:
-        pass
+def networkEval(networkBoth):
+    theNetwork = ipaddress.ip_interface(networkBoth)
+    theNetaddr = theNetwork.network.network_address
+    logging.info(f"Network address: {theNetaddr}")
+    return {
+        "Network Address": str(theNetwork.network.network_address),
+        "Broadcast Address": str(theNetwork.network.broadcast_address),
+        "Subnet Mask": str(theNetwork.netmask),
+        "Wildcard Mask": str(theNetwork.hostmask),
+        "Private Network Space": str(theNetwork.is_private),
+        "Public Network Space": str(theNetwork.is_global),
+        "Total Number of Hosts": len([str(host) for host in theNetwork.network.hosts()]) + 2,
+        "Number of Usable Hosts": str(len([str(host) for host in theNetwork.network.hosts()])),
+        "Available Hosts": [str(host) for host in theNetwork.network.hosts()]
+    }
 
 
 
@@ -58,30 +57,24 @@ def windowCreation():
     window = tk.Tk()
     window.title("Subnet Calculator")
     window.eval('tk::PlaceWindow . center')
+    window.geometry("420x60")
 
 
     greeting = tk.Label(window, text="Welcome to Subnet Calculator\n")
     # greeting.pack()
-
-    tk.Label(window, text="Enter the IP:").grid(row=0)
-    tk.Label(window, text="Enter the subnet:").grid(row=1)
+    #
+    # tk.Label(window, text="Enter the IP:").grid(row=0)
+    # tk.Label(window, text="Enter the subnet:").grid(row=1)
     tk.Label(window, text="Enter the IP and Subnet Mask:").grid(row=2)
-    # netAddGrt.pack()
 
-    networkAddress = tk.Entry(window, width=25, justify="left")
-    networkAddress.insert(10,'x.x.x.x')
-    networkAddress.grid(row=0, column=1)
-    networkSubnet = tk.Entry(window, width=25, justify="left")
-    networkSubnet.insert(10,'255.255.255.0')
-    networkSubnet.grid(row=1, column=1)
     networkBoth = tk.Entry(window, width=25, justify="left")
     networkBoth.insert(10,'10.1.1.1/24')
     networkBoth.grid(row=2, column=1)
 
-    runButton = tk.Button(window, text='Run', command=lambda:showResults(window,networkEval(networkBoth.get(), networkAddress.get(), networkSubnet.get())))
-    runButton.grid(row=3, column=0, sticky=tk.W, pady=5, padx=5)
+    runButton = tk.Button(window, text='Run', command=lambda:showResults(window,networkEval(networkBoth.get())))
+    runButton.grid(row=3, column=0, sticky=tk.W, pady=5, padx=105)
     quitButton = tk.Button(window, text='Quit', command=window.destroy)
-    quitButton.grid(row=3, column=1, sticky=tk.W, pady=5, padx=5)
+    quitButton.grid(row=3, column=1, sticky=tk.W, pady=5, padx=15)
 
 
     window.mainloop()
