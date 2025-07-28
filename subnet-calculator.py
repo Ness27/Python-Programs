@@ -19,14 +19,17 @@ logging.basicConfig(
     ]
 )
 
-def networkEval(arguments):
-    theNetwork = ipaddress.ip_interface(arguments)
-    theNetaddr = theNetwork.network.network_address
-    theBroadcastaddr = theNetwork.network.broadcast_address
-    theHosts = list(theNetwork.network.hosts())
-    theSubnet = theNetwork.netmask
-    theHostmask = theNetwork.hostmask
-    logging.info(f"Network address: {theNetaddr}")
+def networkEval(networkBoth, networkHost, networkSub):
+    if 'x.x.x.x' in networkHost:
+        theNetwork = ipaddress.ip_interface(networkBoth)
+        theNetaddr = theNetwork.network.network_address
+        theBroadcastaddr = theNetwork.network.broadcast_address
+        theHosts = list(theNetwork.network.hosts())
+        theSubnet = theNetwork.netmask
+        theHostmask = theNetwork.hostmask
+        logging.info(f"Network address: {theNetaddr}")
+    else:
+        pass
 
 
 
@@ -43,19 +46,20 @@ def windowCreation():
     tk.Label(window, text="Enter the IP and Subnet Mask:").grid(row=2)
     # netAddGrt.pack()
 
-    networkAddress = tk.Entry(window, width=80, justify="left")
+    networkAddress = tk.Entry(window, width=20, justify="left")
     networkAddress.insert(10,'x.x.x.x')
     networkAddress.grid(row=0, column=1)
-    networkSubnet = tk.Entry(window, width=80, justify="left")
+    networkSubnet = tk.Entry(window, width=20, justify="left")
     networkSubnet.insert(10,'255.255.255.0')
     networkSubnet.grid(row=1, column=1)
-    networkBoth = tk.Entry(window, width=80, justify="left")
+    networkBoth = tk.Entry(window, width=20, justify="left")
     networkBoth.insert(10,'10.1.1.1/24')
     networkBoth.grid(row=2, column=1)
 
-    runButton = tk.Button(window, text='Run', command=lambda: networkEval(networkBoth.get()))
+    runButton = tk.Button(window, text='Run', command=lambda:networkEval(networkBoth.get(), networkAddress.get(), networkSubnet.get()))
     runButton.grid(row=3, column=0, sticky=tk.W, pady=5, padx=5)
-    quitButton = tk.Button(window, text='Quit', command=window.destroy).grid(row=3, column=1, sticky=tk.W, pady=5, padx=5)
+    quitButton = tk.Button(window, text='Quit', command=window.destroy)
+    quitButton.grid(row=3, column=1, sticky=tk.W, pady=5, padx=5)
 
 
     window.mainloop()
