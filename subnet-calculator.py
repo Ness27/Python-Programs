@@ -18,6 +18,20 @@ logging.basicConfig(
     ]
 )
 
+
+def windowCreation():
+    window = tk.Tk()
+    window.title("Subnet Calculator")
+    greeting = tk.Label(window, text="Welcome to Subnet Calculator\n")
+    greeting.pack()
+    netAddGrt = tk.Label(window, text="Enter the IP:")
+    netAddGrt.pack()
+    networkAddress = tk.Entry(window, width=80, justify="center")
+    networkAddress.insert(0, "x.x.x.x")
+    networkAddress.pack()
+    window.mainloop()
+
+
 def setup(args):
     """Initial setup before main logic runs."""
     if args.debug:
@@ -46,6 +60,7 @@ def main():
     logging.info("Starting main program...")
     logging.debug("TEST")
     # Core Program Logic Goes HERE
+    windowCreation()
     logging.info("Program finished.")
     logging.shutdown()
 
