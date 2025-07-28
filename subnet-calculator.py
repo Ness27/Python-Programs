@@ -26,10 +26,7 @@ def networkEval(arguments):
     theHosts = list(theNetwork.network.hosts())
     theSubnet = theNetwork.netmask
     theHostmask = theNetwork.hostmask
-
-
-
-
+    logging.info(f"Network address: {theNetaddr}")
 
 
 
@@ -56,10 +53,10 @@ def windowCreation():
     networkBoth.insert(10,'10.1.1.1/24')
     networkBoth.grid(row=2, column=1)
 
+    runButton = tk.Button(window, text='Run', command=lambda: networkEval(networkBoth.get()))
+    runButton.grid(row=3, column=0, sticky=tk.W, pady=5, padx=5)
+    quitButton = tk.Button(window, text='Quit', command=window.destroy).grid(row=3, column=1, sticky=tk.W, pady=5, padx=5)
 
-
-    tk.Button(window, text='Run', command='command').grid(row=3, column=0, sticky=tk.W, pady=5, padx=5)
-    tk.Button(window, text='Quit', command=window.destroy).grid(row=3, column=1, sticky=tk.W, pady=5, padx=5)
 
     window.mainloop()
 
