@@ -11,7 +11,6 @@ import logging
 import ipaddress
 import time
 import pwinput
-from paramiko.client import AutoAddPolicy
 
 # ️ Configure logging
 logging.basicConfig(
@@ -22,11 +21,17 @@ logging.basicConfig(
     ]
 )
 
-def connectSession(arguments):
+def connectSession(arguments, commands):
     try:
         theIP = format(ipaddress.ip_address(arguments['host']))
         logging.info("Connecting to {} over {} ".format(theIP, arguments['port']))
+
+
         connection = netmiko.ConnectHandler(**arguments)
+        output = connection.send_command(commands)
+        logging.info(output)
+
+        connection.disconnect()
 
     except ValueError as val:
         logging.error('{}'.format(val))
@@ -53,18 +58,20 @@ def main():
     setupComplete = time.perf_counter()
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
-    commandsToRun = ['do show ip int br']
+    commandsToRun = ['show ip int br']
 
-    deviceInfo = {'host':'10.132.101.252',
+    deviceInfo = {'host':input('Enter hostname or IP address: '),
                   'port':'22',
                   'device_type':'cisco_ios',
                   'username':input('user:'),
                   'password':pwinput.pwinput(prompt="Password: ", mask='*')}
 
-    connectSession(deviceInfo)
+    connectSession(deviceInfo, commandsToRun)
 
 
     logging.info("Program finished. - Exiting program.")
+    finalTime = time.perf_counter()
+    logging.info('Total running time: {} seconds.'.format(round(finalTime-startTime,5)))
     logging.shutdown()
 
 if __name__ == "__main__":

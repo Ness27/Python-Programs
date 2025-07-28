@@ -55,7 +55,7 @@ def networkEval(networkBoth):
         "Wildcard Mask": str(theNetwork.hostmask),
         "Private Network Space": str(theNetwork.is_private),
         "Public Network Space": str(theNetwork.is_global),
-        "Total Number of Hosts": str(len(listofHosts)),
+        "Total Number of Hosts": str(len(listofHosts) + 2),
         "Number of Usable Hosts": str(len(listofHosts)),
         "Available Hosts": show_Hosts
     }
