@@ -23,6 +23,7 @@ logging.basicConfig(
     ]
 )
 
+
 def getData(logOutput, theHosts, theCommands, theUser, thePass):
 
     deviceInfo = {'host':'',
@@ -39,6 +40,12 @@ def getData(logOutput, theHosts, theCommands, theUser, thePass):
         deviceInfo['username'] = theUser
         deviceInfo['password'] = thePass
         connectSession(logOutput, deviceInfo, commandList)
+
+    logOutput.config(state='normal')
+    logOutput.insert(tk.END, "✅ Completed Program." + '\n' + "✅ Now Exiting Program." + '\n')
+    logOutput.see(tk.END)
+    logOutput.config(state='disabled')
+    logOutput.update()
 
     return None
 
@@ -75,8 +82,8 @@ def windowCreation():
     passwordLabel = tk.Label(window, text="Enter your password:")
     passwordEntry = tk.Entry(window, width=40, fg="black", bg="lightgrey", show="*")
 
-    logLabel = tk.Label(window, text="Script Output / Log:", fg='black', justify='left')
-    logOutput = scrolledtext.ScrolledText(window, height=10, width=70, fg="white", bg="black", state='disabled')
+    logLabel = tk.Label(window, text="Script Log:", fg='black', justify='left')
+    logOutput = scrolledtext.ScrolledText(window, height=15, width=100, fg="white", bg="black", state='disabled')
 
     runButton = tk.Button(window, bg='green',fg='white', text='Run', command=lambda: getData(logOutput, hostRequest.get('1.0', tk.END),
                                                                                              commandRequest.get('1.0', tk.END),
@@ -110,7 +117,6 @@ def connectSession(logOutput, arguments, commands):
         logOutput.see(tk.END)
         logOutput.config(state='disabled')
         logOutput.update()
-
     try:
         theIP = format(ipaddress.ip_address(arguments['host']))
         logging.info(f"Connecting to {theIP} over {arguments['port']}")
