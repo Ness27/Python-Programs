@@ -42,23 +42,33 @@ def getData(logOutput, theHosts, theCommands, theUser, thePass):
 
     return None
 
+def centerWindow(window, width=1200, height=900):
+    window.update_idletasks()  # ensures geometry data is ready
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x_position = int((screen_width / 2) - (width / 2))
+    y_position = int((screen_height / 2) - (height / 2))
+
+    window.geometry(f"{width}x{height}+{x_position}+{y_position}")
+
+
 
 
 def windowCreation():
     window = tk.Tk()
     window.title("IOS-XE Script Runner")
-    window.eval('tk::PlaceWindow . center')
-    window.geometry("1000x600")
+    centerWindow(window)
 
     theTitle = tk.Label(window, text="Welcome to IOS Script Runner\n")
 
     hostLabel = tk.Label(window, text="Enter the hosts to connect to: (One host per line)",fg='black',justify='left')
 
-    hostRequest = tk.Text(window, height=10, width=40, fg="black", bg="lightgrey")
+    hostRequest = tk.Text(window, height=20, width=30, fg="black", bg="lightgrey")
 
     commandLabel = tk.Label(window, text="Enter the commands to execute on the host (one command per line):",fg='black',justify='left')
 
-    commandRequest = tk.Text(window, height=10, width=40, fg="black", bg="lightgrey")
+    commandRequest = tk.Text(window, height=10, width=60, fg="black", bg="lightgrey")
 
     usernameLabel = tk.Label(window, text="Enter your username:")
     usernameRequest = tk.Entry(window, width=40, fg="black", bg="lightgrey")
@@ -83,10 +93,10 @@ def windowCreation():
     usernameRequest.grid(row=3, column=2)
     passwordLabel.grid(row=4, column=1)
     passwordEntry.grid(row=4, column=2)
-    runButton.grid(row=5, column=1)
-    quitButton.grid(row=5, column=2)
+    runButton.grid(row=5, column=1, pady=10)
+    quitButton.grid(row=5, column=2, pady=10)
     logLabel.grid(row=6, column=1)
-    logOutput.grid(row=6, column=2, columnspan=2)
+    logOutput.grid(row=6, column=2, columnspan=2, pady=10)
 
 
     window.mainloop()
