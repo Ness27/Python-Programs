@@ -14,7 +14,7 @@ import pwinput
 
 # ️ Configure logging
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout)
@@ -58,7 +58,8 @@ def main():
     setupComplete = time.perf_counter()
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
-    commandsToRun = ['show ip int br']
+    # When sending EXEC commands - you cannot give a list unless you iterate over the list. Must be TYPE='str'
+    commandsToRun = 'show ip int br'
 
     deviceInfo = {'host':input('Enter hostname or IP address: '),
                   'port':'22',
