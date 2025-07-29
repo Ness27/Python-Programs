@@ -40,23 +40,19 @@ def showResults(theWindow, resultData):
 
 def networkEval(networkBoth):
     theNetwork = ipaddress.ip_interface(networkBoth)
-    theNetaddr = theNetwork.network.network_address
-    logging.debug(f"Network address: {theNetaddr}")
-    count = 0
-    listofHosts = list(theNetwork.network.hosts())
-    show_Hosts = []
-    while count < 20:
-        show_Hosts.append(str(listofHosts[count]))
-        count += 1
+    net = theNetwork.network
+
+    show_Hosts = [str(ip) for idx, ip in enumerate(net.hosts()) if idx < 20]
+
     return {
-        "Network Address": str(theNetwork.network.network_address),
-        "Broadcast Address": str(theNetwork.network.broadcast_address),
+        "Network Address": str(net.network_address),
+        "Broadcast Address": str(net.broadcast_address),
         "Subnet Mask": str(theNetwork.netmask),
         "Wildcard Mask": str(theNetwork.hostmask),
         "Private Network Space": str(theNetwork.is_private),
         "Public Network Space": str(theNetwork.is_global),
-        "Total Number of Hosts": str(len(listofHosts) + 2),
-        "Number of Usable Hosts": str(len(listofHosts)),
+        "Total Number of Hosts": str(net.num_addresses),
+        "Number of Usable Hosts": str(max(net.num_addresses - 2, 0)),
         "Available Hosts": show_Hosts
     }
 
