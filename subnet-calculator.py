@@ -23,26 +23,70 @@ logging.basicConfig(
 def showResults(theWindow, resultData):
     resultWindow = tk.Toplevel()
     resultWindow.title("Network Results")
-    resultWindow.geometry("400x500")
+    resultWindow.geometry("350x450")
     theWindow.eval(f'tk::PlaceWindow {str(resultWindow)} center')
 
+    # Assuming resultData doesn't include "Available Hosts" in the normal loop
+    info_rows = len(resultData) - 1  # All except "Available Hosts"
+
+    # Display static info
     row = 0
     for key, value in resultData.items():
-        displayText = value if not isinstance(value, list) else "\n".join(value)
-        tk.Label(resultWindow, text=f"{key}:").grid(row=row, column=0, sticky="w", padx=5)
-        tk.Label(resultWindow, text=displayText).grid(row=row, column=1, sticky="w", padx=5)
-        row += 1
-        if row > 20:
-            break
-    quitButton = tk.Button(resultWindow, text='Close', bg='darkred',fg='white',command=resultWindow.destroy)
-    quitButton.grid(row=row+1, column=1, sticky="w", padx=5)
+        if key != "Available Hosts":
+            tk.Label(resultWindow, text=f"{key}:", anchor="w").grid(row=row, column=0, sticky="w", padx=5)
+            tk.Label(resultWindow, text=value, anchor="w").grid(row=row, column=1, sticky="w", padx=5)
+            row += 1
+
+    # Title for hosts
+    tk.Label(resultWindow, text="Available Hosts:", font=("Helvetica", 10, "bold")).grid(row=row, column=0, sticky="w",
+                                                                                         padx=5)
+    row += 1
+
+    # Host display box
+    host_display = tk.Label(resultWindow, justify="left", anchor="w", width=50)
+    host_display.grid(row=row, column=1, columnspan=2, sticky="w", padx=5)
+    row += 1
+
+    # Paging setup
+    host_list = resultData["Available Hosts"]
+    page_size = 10
+    current_page = [0]  # mutable holder so inner functions can modify it
+
+    def update_page():
+        start = current_page[0] * page_size
+        end = start + page_size
+        page_text = "\n".join(host_list[start:end])
+        host_display.config(text=page_text)
+
+    def next_page():
+        if (current_page[0] + 1) * page_size < len(host_list):
+            current_page[0] += 1
+            update_page()
+
+    def prev_page():
+        if current_page[0] > 0:
+            current_page[0] -= 1
+            update_page()
+
+    update_page()
+    # Paging controls now come below
+    paging_controls = tk.Frame(resultWindow)
+    tk.Button(paging_controls, text="⟨ Prev", command=prev_page).pack(side="left", padx=5)
+    tk.Button(paging_controls, text="Next ⟩", command=next_page).pack(side="left", padx=5)
+    paging_controls.grid(row=row, column=0, columnspan=2, pady=10)
+    row += 1
+
+    # Close button at the end
+    quitButton = tk.Button(resultWindow, text='Close', bg='darkred', fg='white', command=resultWindow.destroy)
+    quitButton.grid(row=row, column=0, columnspan=2, pady=10)
+
 
 
 def networkEval(networkBoth):
     theNetwork = ipaddress.ip_interface(networkBoth)
     net = theNetwork.network
 
-    show_Hosts = [str(ip) for idx, ip in enumerate(net.hosts()) if idx < 20]
+    show_Hosts = [str(ip) for idx, ip in enumerate(net.hosts()) if idx < 512]
 
     return {
         "Network Address": str(net.network_address),
