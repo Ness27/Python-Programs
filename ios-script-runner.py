@@ -10,7 +10,6 @@ import sys
 import logging
 import ipaddress
 import time
-import pwinput
 import tkinter as tk
 from tkinter import scrolledtext
 
@@ -39,12 +38,7 @@ def getData(logOutput, theHosts, theCommands, theUser, thePass):
         deviceInfo['host'] = host
         deviceInfo['username'] = theUser
         deviceInfo['password'] = thePass
-        logOutput.config(state='normal')
-        logOutput.insert(tk.END, "Connecting to {} over {}".format(deviceInfo['host'], deviceInfo['port']) + '\n')
-        logOutput.see(tk.END)
-        logOutput.config(state='disabled')
-        logOutput.update()
-        connectSession(deviceInfo, commandList)
+        connectSession(logOutput, deviceInfo, commandList)
 
     return None
 
@@ -69,7 +63,7 @@ def windowCreation():
     usernameLabel = tk.Label(window, text="Enter your username:")
     usernameRequest = tk.Entry(window, width=40, fg="black", bg="lightgrey")
     passwordLabel = tk.Label(window, text="Enter your password:")
-    passwordEntry = tk.Entry(window, width=40, fg="black", bg="lightgrey")
+    passwordEntry = tk.Entry(window, width=40, fg="black", bg="lightgrey", show="*")
 
     logLabel = tk.Label(window, text="Script Output / Log:", fg='black', justify='left')
     logOutput = scrolledtext.ScrolledText(window, height=10, width=70, fg="white", bg="black", state='disabled')
@@ -80,7 +74,7 @@ def windowCreation():
     quitButton = tk.Button(window, text='Quit', bg='darkred',fg='white', command=window.destroy)
 
 
-    theTitle.grid(row=1, column=1)
+    # theTitle.grid(row=1, column=1)
     hostLabel.grid(row=1, column=1)
     hostRequest.grid(row=1, column=2)
     commandLabel.grid(row=2, column=1)
@@ -99,33 +93,52 @@ def windowCreation():
 
     return None
 
-def connectSession(arguments, commands):
+def connectSession(logOutput, arguments, commands):
+    def logMessage(msg):
+        logOutput.config(state='normal')
+        logOutput.insert(tk.END, msg + '\n')
+        logOutput.see(tk.END)
+        logOutput.config(state='disabled')
+        logOutput.update()
+
     try:
         theIP = format(ipaddress.ip_address(arguments['host']))
-        logging.info("Connecting to {} over {} ".format(theIP, arguments['port']))
-
+        logging.info(f"Connecting to {theIP} over {arguments['port']}")
+        logMessage(f"🔌 Connecting to {theIP} over port {arguments['port']}...")
 
         connection = netmiko.ConnectHandler(**arguments)
-        output = connection.send_command(commands)
-        logging.info(output)
+        logMessage(f"✅ Connected to {arguments['host']}")
+
+        for cmd in commands:
+            logMessage(f"📤 Sending command: {cmd}")
+            try:
+                output = connection.send_command(cmd)
+                logging.info(output)
+                logMessage(f"📥 Output from <{cmd}>:\n{output}")
+            except Exception as cmdError:
+                logMessage(f"❌ Error executing command <{cmd}>: {cmdError}")
+                logging.error(f"Command execution error: {cmdError}")
 
         connection.disconnect()
+        logMessage("🔒 Disconnected.\n")
 
     except ValueError as val:
-        logging.error('{}'.format(val))
-        logging.error("Skipping {}".format(str(val).split(' ')[0]))
-        return None
+        msg = str(val).split(' ')[0]
+        logging.error(val)
+        logging.error(f"Skipping {msg}")
+        logMessage(f"❌ ValueError: {val}\nSkipping {msg}")
     except TimeoutError:
-        logging.error("There was an error: {}".format("TimeoutError"))
-        logging.error("Skipping {}".format(arguments['host']))
-        return None
+        logging.error("TimeoutError")
+        logging.error(f"Skipping {arguments['host']}")
+        logMessage(f"⏳ TimeoutError on {arguments['host']}\nSkipping host.")
     except KeyboardInterrupt:
         logging.exception("User interrupt.")
-        logging.error("There was an error: {}".format("KeyboardInterrupt"))
-        logging.error("Exiting program.")
+        logging.error("KeyboardInterrupt - Exiting.")
+        logMessage("🛑 Interrupted by user. Exiting...")
         exit(1)
     except netmiko.exceptions.NetMikoTimeoutException as theError:
-        logging.error("There was an error: {}".format(theError))
+        logging.error(f"NetMikoTimeoutException: {theError}")
+        logMessage(f"⚠️ Connection timeout on {arguments['host']}: {theError}")
 
     return None
 
