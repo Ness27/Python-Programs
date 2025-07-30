@@ -8,18 +8,28 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext, font
 import netmiko, ipaddress, logging, time, sys
 
+
+# ️ Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+
 class IOSXEScriptRunner(tk.Tk):
     def __init__(self):
+        startTime = time.perf_counter()
+        logging.info("Starting IOS-XE Script Runner Program.")
         super().__init__()
         self.title("IOS-XE Script Runner")
         self._center_window(1200, 700)
         self._setup_style()
+        setup_complete = time.perf_counter()
+        logging.info(f'Init and Setup Completed in {setup_complete - startTime:.4f} seconds')
+        logging.info('Starting Build for UI Interface...')
         self._build_ui()
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s [%(levelname)s] %(message)s",
-            handlers=[logging.StreamHandler(sys.stdout)]
-        )
 
     def _center_window(self, w, h):
         self.update_idletasks()
@@ -41,6 +51,7 @@ class IOSXEScriptRunner(tk.Tk):
         style.configure("TLabelframe.Label", font=("Helvetica", 12, "bold"))
 
     def _build_ui(self):
+        startTime = time.perf_counter()
         # Main container
         container = ttk.Frame(self, padding=20)
         container.grid(sticky="NSEW")
@@ -88,8 +99,12 @@ class IOSXEScriptRunner(tk.Tk):
             log_frame, state="disabled", bg="#1e1e1e", fg="#dcdcdc"
         )
         self.log_txt.grid(sticky="NSEW")
+        finishedTime = time.perf_counter()
+        logging.info(f"Finished Building UI in {finishedTime - startTime:.4f} seconds")
 
     def _on_run(self):
+        startTime = time.perf_counter()
+        logging.info("Starting _on_run function to iterate over commands for each host given.")
         hosts   = self.host_txt.get("1.0", tk.END).strip().splitlines()
         cmds    = self.cmd_txt.get("1.0", tk.END).strip().splitlines()
         user    = self.user_entry.get()
@@ -109,10 +124,14 @@ class IOSXEScriptRunner(tk.Tk):
                     self._append_log(f"📥 Output:\n{out}")
                 conn.disconnect()
                 self._append_log("🔒 Disconnected.\n")
+                logging.info('Finished _on_run function for host: {}.'.format(host))
             except Exception as e:
                 self._append_log(f"❌ {e}\n")
+                logging.error('There was an error connecting to: {}.'.format(host))
 
         self._append_log("✅ Completed. Exiting.")
+        finishedTime = time.perf_counter()
+        logging.info(f"Finished _on_run function in {finishedTime - startTime:.4f} seconds")
 
     def _append_log(self, msg):
         self.log_txt.config(state="normal")
