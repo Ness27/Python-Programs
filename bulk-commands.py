@@ -8,11 +8,10 @@ Date: 2025-07-26
 import argparse
 import os
 import logging
-import sys
+import sys, time
 import pwinput
 import ipaddress
-from paramiko import SSHClient, SSHException
-from paramiko.client import AutoAddPolicy
+import netmiko
 
 # ️ Configure logging
 logging.basicConfig(
@@ -45,47 +44,53 @@ def callParser():
 
 
 def connectSession(ip, username, password, port, commandsfile):
-    with SSHClient() as client:
-        ## Allows for auto-adding server SSH key on client host - On First Connection
-        client.set_missing_host_key_policy(AutoAddPolicy())
-        try:
-            theIP = format(ipaddress.ip_address(ip))
-            logging.info("Connecting to {} over {} ".format(theIP, port))
+    try:
+        theIP = format(ipaddress.ip_address(ip))
+        logging.info("Connecting to {} over {} ".format(theIP, port))
 
-            file_extension = os.path.splitext(commandsfile)
-            if file_extension[1] == ".txt":
-                client.connect(theIP, username=username, password=password, port=int(port))
-                with open(commandsfile, 'r') as file:
-                    for line in file:
-                        print(line.strip())
-                       # stdin, stdout, stderr = client.exec_command(line.strip())
-                       # print(stdout.read().decode())
-            else:
-                logging.error("The file <{}> is not a .txt file. - Exiting program.".format(commandsfile))
-                exit(1)
-        except SSHException as e:
-            print(e)
-        except ValueError as val:
-            logging.error('{}'.format(val))
-            logging.error("Skipping {}".format(str(val).split(' ')[0]))
-            return None
-        except TimeoutError:
-            logging.error("There was an error: {}".format("TimeoutError"))
-            logging.error("Skipping {}".format(ip))
-            return None
-        except KeyboardInterrupt:
-            logging.exception("User interrupt.")
-            logging.error("There was an error: {}".format("KeyboardInterrupt"))
-            logging.error("Exiting program.")
+        deviceInfo = {'host': theIP,
+                      'port': port,
+                      'device_type': 'cisco_ios',
+                      'username': username,
+                      'password': password}
+
+        file_extension = os.path.splitext(commandsfile)
+        if file_extension[1] == ".txt":
+            ssh_connection = netmiko.ConnectHandler(**deviceInfo)
+            ssh_connection.send_config_from_file(commandsfile)
+        else:
+            logging.error("The file <{}> is not a .txt file. - Exiting program.".format(commandsfile))
             exit(1)
+    except ValueError as val:
+        logging.error('{}'.format(val))
+        logging.error("Skipping {}".format(str(val).split(' ')[0]))
+        return None
+    except TimeoutError:
+        logging.error("There was an error: {}".format("TimeoutError"))
+        logging.error("Skipping {}".format(ip))
+        return None
+    except KeyboardInterrupt:
+        logging.exception("User interrupt.")
+        logging.error("There was an error: {}".format("KeyboardInterrupt"))
+        logging.error("Exiting program.")
+        exit(1)
+    except netmiko.exceptions.NetMikoTimeoutException as theError:
+        logging.error("There was an error: {}".format(theError))
 
     return None
 
 def main():
+    startTime = time.perf_counter()
+    logging.info("Initialization Complete.")
+    logging.info("Starting Setup...")
+
+    # Get arguments
     arguments = callParser()
-    logging.debug(arguments)
-    logging.info("Setup complete.")
-    logging.info("Starting main program...")
+
+    setupComplete = time.perf_counter()
+    logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
+
+    # Get username and password to sign into device.
     arguments.username = input("Username: ")
     arguments.password = pwinput.pwinput(prompt="Password: ", mask='*')
 
@@ -105,6 +110,8 @@ def main():
         print("\n" + arguments.format_usage())
 
     logging.info("Program finished. - Exiting program.")
+    finalTime = time.perf_counter()
+    logging.info('Total running time: {} seconds.'.format(round(finalTime-startTime,5)))
     logging.shutdown()
 
 if __name__ == "__main__":
