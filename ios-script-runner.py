@@ -111,10 +111,11 @@ class IOSXEScriptRunner(tk.Tk):
         pwd     = self.pw_entry.get()
 
         for host in hosts:
-            self._append_log(f"🔌 Connecting to {host} over 22...")
+            self._append_log(f"🔌 Connecting to {host} over port 22...")
             try:
+                theIP = ipaddress.ip_address(host)
                 conn = netmiko.ConnectHandler(
-                    host=host, device_type="cisco_ios",
+                    host=theIP, device_type="cisco_ios",
                     username=user, password=pwd
                 )
                 self._append_log(f"✅ Connected to {host}")
@@ -125,6 +126,11 @@ class IOSXEScriptRunner(tk.Tk):
                 conn.disconnect()
                 self._append_log("🔒 Disconnected.\n")
                 logging.info('Finished _on_run function for host: {}.'.format(host))
+            except ValueError as val:
+                self._append_log(f"❌ {val}")
+                self._append_log("❌ Skipping {}\n".format(str(val).split(' ')[0]))
+                logging.error('{}'.format(val))
+                logging.error("Skipping {}".format(str(val).split(' ')[0]))
             except Exception as e:
                 self._append_log(f"❌ {e}\n")
                 logging.error('There was an error connecting to: {}.'.format(host))
