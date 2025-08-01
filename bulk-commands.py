@@ -64,11 +64,9 @@ def connectSession(ip, username, password, port, commandsfile):
     except ValueError as val:
         logging.error('{}'.format(val))
         logging.error("Skipping {}".format(str(val).split(' ')[0]))
-        return None
     except TimeoutError:
         logging.error("There was an error: {}".format("TimeoutError"))
         logging.error("Skipping {}".format(ip))
-        return None
     except KeyboardInterrupt:
         logging.exception("User interrupt.")
         logging.error("There was an error: {}".format("KeyboardInterrupt"))
