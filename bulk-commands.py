@@ -58,9 +58,9 @@ def connectSession(ip, username, password, port, commandsfile):
         if file_extension[1] == ".txt":
             ssh_connection = netmiko.ConnectHandler(**deviceInfo)
             ssh_connection.send_config_from_file(commandsfile)
+            ssh_connection.disconnect()
         else:
-            logging.error("The file <{}> is not a .txt file. - Exiting program.".format(commandsfile))
-            exit(1)
+            logging.error("The file <{}> is not a .txt file. Abort Connection.".format(commandsfile))
     except ValueError as val:
         logging.error('{}'.format(val))
         logging.error("Skipping {}".format(str(val).split(' ')[0]))
