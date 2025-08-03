@@ -1,14 +1,13 @@
 """
-Filename: main-template.py
+Filename: test.py
 Description: Brief overview of what this script does.
 Author: Hunter R.
-Date: 2025-07-26
+Date: 2025-08-02
 """
 
 import argparse
 import logging
-import sys
-import time
+import sys, time
 
 # ️ Configure logging
 logging.basicConfig(
@@ -17,6 +16,19 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout)
     ]
 )
+
+def callParser():
+    parser = argparse.ArgumentParser(prog='test.py',
+                                     add_help=True,
+                                     description='A Standard Python Template.',
+                                     epilog='\nEnd of the help text.')
+    parser.add_argument('-e', '--error', action='store_true',help='Enable ERROR level logging', required=False, default=False, dest='error')
+    parser.add_argument('-i', '--info', action='store_true',help='Enable INFO level logging', required=False, default=True, dest='info')
+    parser.add_argument('-d', "--debug", action="store_true", help="Enable DEBUG level logging", required=False, default=False, dest="debug")
+    # Add more arguments as needed
+
+    args = parser.parse_args()
+    return args
 
 def setup(args):
     """Initial setup before main logic runs."""
@@ -36,20 +48,11 @@ def main():
     logging.info("Initialization Complete.")
     logging.info("Starting Setup...")
 
-    parser = argparse.ArgumentParser(prog='main-template.py',
-                                     add_help=True,
-                                     description='A Standard Python Template.',
-                                     epilog='\nEnd of the help text.')
-    parser.add_argument('-e', '--error', action='store_true',help='Enable ERROR level logging', required=False, default=False, dest='error')
-    parser.add_argument('-i', '--info', action='store_true',help='Enable INFO level logging', required=False, default=True, dest='info')
-    parser.add_argument('-d', "--debug", action="store_true", help="Enable DEBUG level logging", required=False, default=False, dest="debug")
-    # Add more arguments as needed
-
-    args = parser.parse_args()
+    args = callParser()
     setup(args)
+
     setupComplete = time.perf_counter()
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
-
 
     # Core Program Logic Goes HERE
 
