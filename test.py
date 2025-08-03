@@ -28,6 +28,10 @@ def callParser():
     # Add more arguments as needed
 
     args = parser.parse_args()
+
+    if len(sys.argv) <= 1:
+        parser.print_usage()
+
     return args
 
 def setup(args):
@@ -55,7 +59,6 @@ def main():
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
     # Core Program Logic Goes HERE
-
 
     logging.info("Program finished. - Exiting program.")
     finalTime = time.perf_counter()
