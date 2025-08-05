@@ -17,6 +17,7 @@ logging.basicConfig(
     ]
 )
 
+
 def callParser():
     parser = argparse.ArgumentParser(prog='test.py',
                                      add_help=True,
@@ -59,6 +60,7 @@ def main():
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
     # Core Program Logic Goes HERE
+
 
     logging.info("Program finished. - Exiting program.")
     finalTime = time.perf_counter()

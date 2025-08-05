@@ -21,13 +21,52 @@ logging.basicConfig(
     ]
 )
 
+class networkingDevice():
+    def __init__(self):
+        self.hostname = ''
+        self.username = ''
+        self.password = ''
+        self.device_type = 'cisco_ios'
+        self.port = '22'
+        self.results = {}
+        self.__compile__()
+
+    def __compile__(self):
+        self.results = {'host': self.hostname,
+                   'port': self.port,
+                   'device_type': self.device_type,
+                   'username': self.username,
+                   'password': self.password}
+
+    def __getitem__(self, item):
+        return self.results[item]
+
+    def getDeviceInfo(self):
+        return self.results
+
+    def setUser(self, user = '<USER>'):
+        self.username = user
+        self.__compile__()
+
+    def setPassword(self, password = '<PASSWORD>'):
+        self.password = password
+        self.__compile__()
+
+    def setHostIp(self, ipaddr):
+        self.hostname = ipaddr
+        self.__compile__()
+
+    def setDeviceType(self, device_type):
+        self.device_type = device_type
+        self.__compile__()
+
 def connectSession(arguments, commands):
     try:
         theIP = format(ipaddress.ip_address(arguments['host']))
         logging.info("Connecting to {} over {} ".format(theIP, arguments['port']))
 
 
-        connection = netmiko.ConnectHandler(**arguments)
+        connection = netmiko.ConnectHandler(**arguments.getDeviceInfo())
         output = connection.send_command(commands)
         logging.info(output)
 
@@ -61,11 +100,10 @@ def main():
     # When sending EXEC commands - you cannot give a list unless you iterate over the list. Must be TYPE='str'
     commandsToRun = 'show ip int br'
 
-    deviceInfo = {'host':input('Enter hostname or IP address: '),
-                  'port':'22',
-                  'device_type':'cisco_ios',
-                  'username':input('user:'),
-                  'password':pwinput.pwinput(prompt="Password: ", mask='*')}
+    deviceInfo = networkingDevice()
+    deviceInfo.setHostIp(input('Enter host ip: '))
+    deviceInfo.setUser(input('Enter username: '))
+    deviceInfo.setPassword(pwinput.pwinput(prompt="Password: ", mask='*'))
 
     connectSession(deviceInfo, commandsToRun)
 
