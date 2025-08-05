@@ -65,8 +65,9 @@ def connectSession(arguments, commands):
 
 
         connection = netmiko.ConnectHandler(**arguments.get_connection_info(include_password=True))
-        output = connection.send_command(commands)
-        logging.info(output)
+        for cmd in commands:
+            output = connection.send_command(cmd)
+            logging.info(output)
 
         connection.disconnect()
 
@@ -96,7 +97,7 @@ def main():
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
     # When sending EXEC commands - you cannot give a list unless you iterate over the list. Must be TYPE='str'
-    commandsToRun = 'show ip int br'
+    commandsToRun = ['show ip int br']
 
     deviceInfo = networkingDevice()
     deviceInfo.set_host_ip(input('Enter host ip: '))
