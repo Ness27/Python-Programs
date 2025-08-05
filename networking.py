@@ -15,7 +15,6 @@ class networkingDevice():
 
     def __getitem__(self, item):
         if item == 'password':
-            logging.critical('Cannot retrieve {}'.format(item))
             raise KeyError("Direct access to password is not allowed.")
         return self.get_connection_info().get(item)
 
@@ -26,7 +25,7 @@ class networkingDevice():
             'device_type': self.device_type,
             'username': self.username,
         }
-        if include_password:
+        if include_password is True:
             info['password'] = self._password
         return info
 
