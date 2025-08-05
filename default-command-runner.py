@@ -63,7 +63,7 @@ def connectSession(arguments, commands):
         theIP = format(ipaddress.ip_address(arguments['host']))
         logging.info("Connecting to {} over {} ".format(theIP, arguments['port']))
 
-
+        # connection = netmiko.ConnectHandler(**arguments)
         connection = netmiko.ConnectHandler(**arguments.get_connection_info(include_password=True))
         for cmd in commands:
             output = connection.send_command(cmd)
@@ -97,6 +97,12 @@ def main():
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
     # Core Logic Starts Here
+    
+    # deviceInfo = {'host': input('Enter hostname or IP address: '),
+    #           'port': '22',
+    #           'device_type': 'cisco_ios',
+    #           'username': input('user:'),
+    #           'password': pwinput.pwinput(prompt="Password: ", mask='*')}
 
     commandsToRun = ['show ip int br']
 
