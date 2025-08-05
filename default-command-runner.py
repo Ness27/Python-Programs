@@ -25,40 +25,38 @@ class networkingDevice():
     def __init__(self):
         self.hostname = ''
         self.username = ''
-        self.password = ''
+        self._password = ''
         self.device_type = 'cisco_ios'
         self.port = '22'
-        self.results = {}
-        self.__compile__()
-
-    def __compile__(self):
-        self.results = {'host': self.hostname,
-                   'port': self.port,
-                   'device_type': self.device_type,
-                   'username': self.username,
-                   'password': self.password}
 
     def __getitem__(self, item):
-        return self.results[item]
+        if item == 'password':
+            logging.critical('Cannot retrieve {}'.format(item))
+            raise KeyError("Direct access to password is not allowed.")
+        return self.get_connection_info().get(item)
 
-    def getDeviceInfo(self):
-        return self.results
+    def get_connection_info(self, include_password=False):
+        info = {
+            'host': self.hostname,
+            'port': str(self.port),
+            'device_type': self.device_type,
+            'username': self.username,
+        }
+        if include_password:
+            info['password'] = self._password
+        return info
 
-    def setUser(self, user = '<USER>'):
+    def set_user(self, user = '<USER>'):
         self.username = user
-        self.__compile__()
 
-    def setPassword(self, password = '<PASSWORD>'):
-        self.password = password
-        self.__compile__()
+    def set_password(self, password = '<PASSWORD>'):
+        self._password = password
 
-    def setHostIp(self, ipaddr):
-        self.hostname = ipaddr
-        self.__compile__()
+    def set_host_ip(self, ip):
+        self.hostname = ip
 
-    def setDeviceType(self, device_type):
+    def set_device_type(self, device_type):
         self.device_type = device_type
-        self.__compile__()
 
 def connectSession(arguments, commands):
     try:
@@ -66,7 +64,7 @@ def connectSession(arguments, commands):
         logging.info("Connecting to {} over {} ".format(theIP, arguments['port']))
 
 
-        connection = netmiko.ConnectHandler(**arguments.getDeviceInfo())
+        connection = netmiko.ConnectHandler(**arguments.get_connection_info(include_password=True))
         output = connection.send_command(commands)
         logging.info(output)
 
@@ -101,9 +99,9 @@ def main():
     commandsToRun = 'show ip int br'
 
     deviceInfo = networkingDevice()
-    deviceInfo.setHostIp(input('Enter host ip: '))
-    deviceInfo.setUser(input('Enter username: '))
-    deviceInfo.setPassword(pwinput.pwinput(prompt="Password: ", mask='*'))
+    deviceInfo.set_host_ip(input('Enter host ip: '))
+    deviceInfo.set_user(input('Enter username: '))
+    deviceInfo.set_password(pwinput.pwinput(prompt="Password: ", mask='*'))
 
     connectSession(deviceInfo, commandsToRun)
 
