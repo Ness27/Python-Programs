@@ -60,9 +60,8 @@ def main():
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
     # Core Program Logic Goes HERE
-    test = ['test', 'test2']
-    for lbl in test:
-        logging.info('Testing {}'.format(lbl))
+
+
 
     logging.info("Program finished. - Exiting program.")
     finalTime = time.perf_counter()

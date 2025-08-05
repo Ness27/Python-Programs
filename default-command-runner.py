@@ -96,7 +96,8 @@ def main():
     setupComplete = time.perf_counter()
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
-    # When sending EXEC commands - you cannot give a list unless you iterate over the list. Must be TYPE='str'
+    # Core Logic Starts Here
+
     commandsToRun = ['show ip int br']
 
     deviceInfo = networkingDevice()
