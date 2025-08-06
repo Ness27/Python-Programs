@@ -8,7 +8,7 @@ Date: 2025-08-05
 class networkingDevice():
     def __init__(self):
         self.hostname = ''
-        self.username = ''
+        self._username = ''
         self._password = ''
         self.device_type = 'cisco_ios'
         self.port = '22'
@@ -23,14 +23,14 @@ class networkingDevice():
             'host': self.hostname,
             'port': str(self.port),
             'device_type': self.device_type,
-            'username': self.username,
+            'username': self._username,
         }
         if include_password == True:
             info['password'] = self._password
         return info
 
     def set_user(self, user = '<USER>'):
-        self.username = user
+        self._username = user
 
     def set_password(self, password = '<PASSWORD>'):
         self._password = password
