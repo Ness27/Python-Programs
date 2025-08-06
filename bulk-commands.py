@@ -101,7 +101,7 @@ def main():
                     connectSession(theIp, arguments.username, arguments.password, arguments.port, arguments.commandsfile)
         else:
             logging.error("The file <{}> is not a .txt file. - Exiting program.".format(arguments.hostfile))
-            exit(1)
+            pass
     elif arguments.command == 'ssh':
         connectSession(arguments.ip, arguments.username, arguments.password, arguments.port, arguments.commandsfile)
     else:
