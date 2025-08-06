@@ -25,7 +25,7 @@ class networkingDevice():
             'device_type': self.device_type,
             'username': self.username,
         }
-        if include_password is True:
+        if include_password == True:
             info['password'] = self._password
         return info
 
