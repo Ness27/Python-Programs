@@ -35,7 +35,7 @@ def connectSession(arguments, commands):
 
         # Needs to be TYPE <list> and configuration commands
         # connection.send_config_set(commands)
-        
+
         for cmd in commands:
             output = connection.send_command(cmd)
             logging.info(output)
