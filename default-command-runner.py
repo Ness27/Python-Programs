@@ -77,9 +77,7 @@ def main():
 
     commandsToRun = ['show ip int br']
 
-    deviceInfo = networkingDevice()
-    deviceInfo.set_host_ip(input('Enter host ip: '))
-    deviceInfo.set_user(input('Enter username: '))
+    deviceInfo = networkingDevice(hostname=input('Enter hostname: '), username=input('Enter username: '))
     deviceInfo.set_password(pwinput.pwinput(prompt="Password: ", mask='*'))
 
     connectSession(deviceInfo, commandsToRun)

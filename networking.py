@@ -14,7 +14,9 @@ class networkingDevice:
         self.port = port
 
     def __repr__(self):
-        return 'networkingDevice(hostname={}, username={}, password=****, device_type={}, port={})'.format(self.hostname,self._username, self.device_type, self.port)
+        return (f"{self.__class__.__name__}(hostname={self.hostname!r}, "
+                f"username={self._username!r}, password=****, "
+                f"device_type={self.device_type!r}, port={self.port!r})")
 
     def __getitem__(self, item):
         if item == 'password':
@@ -25,9 +27,9 @@ class networkingDevice:
     def password(self):
         raise AttributeError("Direct access to password is restricted.")
 
-    @password.getter
-    def password(self):
-        raise AttributeError("Direct access to password is restricted.")
+    @password.setter
+    def password(self, password):
+        raise AttributeError("Use: networkingDevice.set_password(password).")
 
     def get_connection_info(self, include_password=False):
         info = {
@@ -51,3 +53,18 @@ class networkingDevice:
 
     def set_device_type(self, device_type):
         self.device_type = device_type
+
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            if key == 'password':
+                self.set_password(value)
+            elif key == 'username':
+                self.set_user(value)
+            elif key == 'hostname':
+                self.set_host_ip(value)
+            elif key == 'device_type':
+                self.set_device_type(value)
+            elif key == 'port':
+                self.port = value
+
+
