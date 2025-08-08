@@ -5,6 +5,22 @@ Author: Hunter R.
 Date: 2025-08-05
 """
 
+### Wrapper Function to log called function and report time performance and keyword arguments and positional arguments.
+def my_logging(func):
+    import time
+    import logging
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        logging.info("Initializing {}() function.".format(func.__name__))
+        logging.info(
+            f"Finished running {func.__name__}() function with args={args}, kwargs={kwargs} "
+            f"in {end_time - start_time:.5f} seconds."
+        )
+        return result
+    return wrapper
+
 class networkingDevice:
     def __init__(self, hostname='', username='', password='', device_type='cisco_ios', port='22'):
         self.hostname = hostname
