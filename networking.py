@@ -5,18 +5,29 @@ Author: Hunter R.
 Date: 2025-08-05
 """
 
-class networkingDevice():
-    def __init__(self):
-        self.hostname = ''
-        self._username = ''
-        self._password = ''
-        self.device_type = 'cisco_ios'
-        self.port = '22'
+class networkingDevice:
+    def __init__(self, hostname='', username='', password='', device_type='cisco_ios', port='22'):
+        self.hostname = hostname
+        self._username = username
+        self._password = password
+        self.device_type = device_type
+        self.port = port
+
+    def __repr__(self):
+        return 'networkingDevice(hostname={}, username={}, password=****, device_type={}, port={})'.format(self.hostname,self._username, self.device_type, self.port)
 
     def __getitem__(self, item):
         if item == 'password':
             raise KeyError("Direct access to password is not allowed.")
         return self.get_connection_info().get(item)
+
+    @property
+    def password(self):
+        raise AttributeError("Direct access to password is restricted.")
+
+    @password.getter
+    def password(self):
+        raise AttributeError("Direct access to password is restricted.")
 
     def get_connection_info(self, include_password=False):
         info = {
@@ -40,11 +51,3 @@ class networkingDevice():
 
     def set_device_type(self, device_type):
         self.device_type = device_type
-
-
-if __name__ == "__main__":
-    try:
-        pass
-    except KeyboardInterrupt:
-        print('\nExiting: KeyboardInterrupt')
-        exit(0)
