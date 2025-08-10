@@ -16,8 +16,8 @@ def change_date_format(date_str):
     for fmt in formats:
         try:
             parsed = datetime.datetime.strptime(date_str, fmt)
-            print(f"Format matched: {fmt} → Parsed date: {parsed.date().strftime(fmt)}")
-            print('Returning Date in Format of: {}'.format(parsed.date().strftime("%Y-%m-%d")))
+            # print(f"Format matched: {fmt} → Parsed date: {parsed.date().strftime(fmt)}")
+            # print('Returning Date in Format of: {}'.format(parsed.date().strftime("%Y-%m-%d")))
             return parsed.date().strftime("%Y-%m-%d")
         except ValueError:
             continue
@@ -32,7 +32,7 @@ def main():
 
     currentDay = datetime.date.today()
     theDay = currentDay.strftime("%A %d, %B %Y")
-    print('Current Day -> {}\n'.format(theDay))
+    print(f"\nCurrent Day -> \t\t{theDay} ({change_date_format(currentDay.strftime("%d-%m-%Y"))})\n\n")
 
     enterDate = input('Enter destination date (yyyy-mm-dd) or (mm-dd-yyy): ')
     enterDate = change_date_format(enterDate)
@@ -61,9 +61,9 @@ def main():
         time.sleep(1)
         timing += 1
 
-    print(f"\nDestination Date -> {destinationDate.strftime('%A %d, %B %Y')}")
-    print(f"Destination Date -> {enterDate}")
-    print(f"Time Delta -> {delta.years} years, {delta.months} months, {delta.days} days {direction}\n")
+    print(f"\n\nCurrent Day -> \t\t{theDay} ({change_date_format(currentDay.strftime("%d-%m-%Y"))})")
+    print(f"Destination Date -> \t{destinationDate.strftime('%A %d, %B %Y')} ({enterDate})")
+    print(f"Time Delta -> \t\t{delta.years} years, {delta.months} months, {delta.days} days {direction}\n")
 
 
 
@@ -72,5 +72,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("Interrupted by user.")
+        print("\nInterrupted by user.")
         sys.exit(0)
