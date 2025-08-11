@@ -63,7 +63,8 @@ def main():
 
     print(f"\n\nCurrent Day -> \t\t{theDay} ({change_date_format(currentDay.strftime("%d-%m-%Y"))})")
     print(f"Destination Date -> \t{destinationDate.strftime('%A %d, %B %Y')} ({enterDate})")
-    print(f"Time Delta -> \t\t{delta.years} years, {delta.months} months, {delta.days} days {direction}\n")
+    print(f"Time Delta -> \t\t{delta.years} years, {delta.months} months, {delta.days} days {direction}"
+          f" ({abs((currentDay - destinationDate).days)} days {direction})\n")
 
 
 
