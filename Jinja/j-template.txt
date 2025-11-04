@@ -1,0 +1,6 @@
+Hostname: {{hostname}}
+{% for ip_addr in ipList %}IP: {{ip_addr}}
+{% endfor %}
+
+This is a test to resolve the host: {{hostname}} to an IP Address.
+The following IP addresses resolved from {{hostname}}: {{ipList}}
