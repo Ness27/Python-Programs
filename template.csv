@@ -1,0 +1,4 @@
+Hostname,External IP, Internal IP, External Port, VIP Name,
+{%- for item in extip %}
+{{hostname}},{{item}},{{internal_ip[loop.index0]}},{{port[loop.index0]}},{{vip[loop.index0]}},
+{%- endfor %}

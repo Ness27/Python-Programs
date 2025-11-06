@@ -13,6 +13,7 @@ import ipaddress
 import time
 import pwinput
 from networking import networkingDevice
+import re, jinja2, os
 
 # ️ Configure logging
 logging.basicConfig(
@@ -23,24 +24,57 @@ logging.basicConfig(
     ]
 )
 
+def generateJinjaTemplates(data):
+    jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(os.getcwd()))
+    logging.info("Jinja2 Environment initialized.")
+    template = jinja_env.get_template('template.csv')
+    result = template.render(data)
+    document = open('output.csv', 'w')
+    document.write(result)
+    document.close()
+    logging.info(f'\n{result}\n')
+
+    return None
+
+def obtainData(output):
+    ext_pattern = re.compile(r'extip (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+    mapped_pattern = re.compile(r'mappedip "(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"')
+    extport_pattern = re.compile(r'extport (\d+)')
+    hostName_pattern = re.compile(r'(\w+-FW\w+)')
+    vipName_pattern = re.compile(r'edit "(\w+)"')
+
+    logging.info(output)
+    getExtIP = ext_pattern.findall(output)
+    getMappedIP = mapped_pattern.findall(output)
+    getExtPort = extport_pattern.findall(output)
+    getHostName = hostName_pattern.findall(output)
+    vipName = vipName_pattern.findall(output)
+    data = {'expip': getExtIP,
+            'hostname': getHostName[0],
+            'port': getExtPort,
+            'internal_ip': getMappedIP,
+            'vip': vipName}
+
+    return data
+
 def connectSession(arguments, commands):
     try:
         theIP = format(ipaddress.ip_address(arguments['host']))
         logging.info("Connecting to {} over {} ".format(theIP, arguments['port']))
 
-        # connection = netmiko.ConnectHandler(**arguments)
-
         connection = netmiko.ConnectHandler(**arguments.get_connection_info(include_password=True))
-
-        # Needs to be TYPE <list> for send_multiline
-        # connection.send_multiline(commands)
 
         # Needs to be TYPE <list> and configuration commands
         # connection.send_config_set(commands)
 
-        for cmd in commands:
-            output = connection.send_command(cmd)
-            logging.info(output)
+        # Needs to be TYPE <list> for send_multiline
+        output = connection.send_multiline(commands)
+
+        # Filter and obtain needed data for template.
+        data_dict = obtainData(output)
+
+        # Generate the output based on the data handed to the Jinja Templates.
+        writeTemplate = generateJinjaTemplates(data_dict)
 
         connection.disconnect()
 
@@ -69,15 +103,7 @@ def main():
     setupComplete = time.perf_counter()
     logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
 
-    # Core Logic Starts Here
-    
-    # deviceInfo = {'host': input('Enter hostname or IP address: '),
-    #           'port': '22',
-    #           'device_type': 'fortinet',
-    #           'username': input('user:'),
-    #           'password': pwinput.pwinput(prompt="Password: ", mask='*')}
-
-    commandsToRun = ['show firewall address']
+    commandsToRun = ['show firewall vip', 'get system status']
 
     deviceInfo = networkingDevice(hostname=input('Enter hostname: '), username=input('Enter username: '), device_type='fortinet')
     deviceInfo.set_password(pwinput.pwinput(prompt="Password: ", mask='*'))
