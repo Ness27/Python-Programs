@@ -20,11 +20,11 @@ def main():
 
     print('\nCurrent Directory-> {}\n'.format(selectDir))
 
-    skipdir = os.getcwd() + '.git'
+    skipdir = '.git'
     print(' ')
     for directory, subdirectories, files in os.walk(selectDir):
-        if set(skipdir).issubset(directory):
-            pass
+        if skipdir in directory:
+            continue
         else:
             print('Directory -> {}\t'.format(directory))
             if len(subdirectories) > 0:

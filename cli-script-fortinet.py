@@ -28,7 +28,7 @@ def generateJinjaTemplates(data):
     jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(os.getcwd()))
     logging.info("Jinja2 Environment initialized.")
     template = jinja_env.get_template('template.csv')
-    result = template.render(data)
+    result = template.render(extip=data['extip'],port=data['port'], hostname=data['hostname'], internal_ip=data['internal_ip'],vip=data['vip'])
     document = open('output.csv', 'w')
     document.write(result)
     document.close()
@@ -49,7 +49,7 @@ def obtainData(output):
     getExtPort = extport_pattern.findall(output)
     getHostName = hostName_pattern.findall(output)
     vipName = vipName_pattern.findall(output)
-    data = {'expip': getExtIP,
+    data = {'extip': getExtIP,
             'hostname': getHostName[0],
             'port': getExtPort,
             'internal_ip': getMappedIP,
