@@ -16,7 +16,8 @@ from tkinter import ttk, scrolledtext
 # ️ Configure logging
 logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
+    handlers=[logging.StreamHandler(sys.stdout)],
+    level=logging.INFO,
 )
 
 def configure_style(theRoot):
@@ -154,34 +155,16 @@ def windowCreation():
 
     root.mainloop()
 
-def setup(args):
-    if args.debug:
-        lvl = logging.DEBUG
-    elif args.error:
-        lvl = logging.ERROR
-    elif args.info:
-        lvl = logging.INFO
-    else:
-        lvl = logging.INFO
-    logging.getLogger().setLevel(lvl)
-    logging.info("Setup complete.")
-
 def main():
     start = time.perf_counter()
-    parser = argparse.ArgumentParser(
-        prog='subnet-calculator.py',
-        description='Network subnet calculator'
-    )
-    parser.add_argument('-e', '--error', action='store_true', dest='error')
-    parser.add_argument('-i', '--info', action='store_true', dest='info', default=True)
-    parser.add_argument('-d', '--debug', action='store_true', dest='debug')
-    args = parser.parse_args()
 
-    setup(args)
     logging.info("Starting GUI...")
+
     setup_complete = time.perf_counter()
     logging.info(f'Init in {setup_complete - start:.4f}s')
+
     windowCreation()
+
     logging.info("Program finished.")
     logging.shutdown()
 
