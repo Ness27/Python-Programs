@@ -2,3 +2,4 @@ test.py
 test.txt
 __pycache__
 .idea
+results.csv
