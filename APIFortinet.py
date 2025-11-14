@@ -4,20 +4,7 @@ Description: Creating a FortiGate API class.
 Author: Hunter R.
 Date: 2025-11-12
 """
-import sys, re, json, time, logging, csv
-import pprint
 import requests
-import getpass
-
-
-# ️ Configure logging
-logging.basicConfig(
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ],
-    level=logging.INFO
-)
 
 class FortiGateAPI:
     def __init__(self, ip, headers, verify=False, proxies=None, disable_warnings=True, secure=True):
@@ -88,64 +75,27 @@ class FortiGateAPI:
     def put(self, path, api='v2', params=None, data=None):
         if isinstance(path, list):
             path = '/'.join(path) + '/'
-        if self._secure:
-            http='https://'
-        else:
-            http='http://'
-        return requests.put(http+self.ip+'/api/'+api+'/'+path, headers=self.header,cookies=self.cookies,
+        return requests.put(self.url_prefix + '/api/' + api + '/' + path, headers=self.headers,cookies=self.cookies,
                             verify=self.verify, proxies=self.proxies, params=params, json={'json': data})
 
     def post(self, path, api='v2', params=None, data=None, files=None):
         if isinstance(path, list):
             path = '/'.join(path) + '/'
-        if self._secure:
-            http='https://'
-        else:
-            http='http://'
-        return requests.post(http+self.ip+'/api/'+api+'/'+path, headers=self.header,cookies=self.cookies,
+        return requests.post(self.url_prefix + '/api/'+api+'/'+path, headers=self.header,cookies=self.cookies,
                             verify=self.verify, proxies=self.proxies, params=params, json={'json': data},
                             files=files)
 
     def delete(self, path, api='v2', params=None, data=None):
         if isinstance(path, list):
             path = '/'.join(path) + '/'
-        if self._secure:
-            http='https://'
-        else:
-            http='http://'
-        return requests.delete(http+self.ip+'/api/'+api+'/'+path, headers=self.header,cookies=self.cookies,
+        return requests.delete(self.url_prefix + '/api/'+api+'/'+path, headers=self.header,cookies=self.cookies,
                             verify=self.verify, proxies=self.proxies, params=params, json={'json': data})
 
-    def show(self, path, api='v2', params=None):
-        response = self.get(path, api=api, params=params)
-        return response.json()
-
-    def edit(self, path, api='v2', params=None, data=None):
-        response = self.put(path, api=api, params=params, data=data)
-        return response.json()
-
-    def create(self, path, api='v2', params=None, data=None, files=None):
-        response = self.post(path, api=api, params=params, data=data, files=files)
-        return response.json()
-
-    def remove(self, path, api='v2', params=None, data=None):
-        response = self.delete(path, api=api, params=params, data=data)
-        return response.json()
-
-    @staticmethod
-    def print_data(response, verbose=False):
-        if response['status']=='success':
-            if verbose:
-                pprint.pprint (response)
-            elif response['http_method']=='GET':
-                pprint.pprint (response['results'])
-            else:
-                print ('OK!')
+    def print_data(self, response):
+        if response.status_code == 200:
+            print(response.text)
         else:
-            print ('Fail!')
-            pprint.pprint (response)
-
-
+            print('Response Code -> {}\n'.format(response.status_code))
 
 def main():
     un = "admin"
