@@ -97,39 +97,4 @@ class FortiGateAPI:
         else:
             print('Response Code -> {}\n'.format(response.status_code))
 
-def main():
-    un = "admin"
-    pw = getpass.getpass()
-    #proxy={'http': 'socks5://127.0.0.1:9000'}
-    proxy = None
 
-    fw = '10.1.1.1'
-
-    intf = {
-              "name": "test",
-              "vdom": "root",
-              "allowaccess": "ping",
-              "ip": "1.1.1.1 255.255.255.0",
-              "role": "lan",
-              "type": "aggregate",
-              "member": [
-                {
-                    "interface-name": "port1"
-                },
-                {
-                    "interface-name": "dmz"
-                }
-              ]
-            }
-
-    try:
-        test = FortiGateAPI(fw, un, pw, proxies=proxy)
-        test.print_data (test.show('cmdb/system/interface'))
-        test.print_data (test.create('cmdb/system/interface', data=intf))
-
-    except Exception as ex:
-        logging.info(f"Exception: {ex}")
-        raise ex
-
-if __name__ == "__main__":
-    main()
