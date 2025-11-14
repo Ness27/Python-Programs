@@ -20,12 +20,11 @@ logging.basicConfig(
 )
 
 class FortiGateAPI:
-    def __init__(self, ip, user, password, headers=None, verify=False, proxies=None, disable_warnings=True, secure=True):
+    def __init__(self, ip, headers, verify=False, proxies=None, disable_warnings=True, secure=True):
         self._secure=secure
         self.verify = verify
         self.ip = ip
         self.proxies=proxies
-        unpw = {'username': user, 'secretkey': password}
 
         if self._secure:
             self.url_prefix = 'https://' + self.ip
@@ -47,11 +46,8 @@ class FortiGateAPI:
             requests.packages.urllib3.disable_warnings()
 
         authenticatedSession = requests.Session()
-        authenticatedSession.post(self.url_prefix + '/logincheck',data='username=' + user + '&secretkey=' + password + '&ajax=1', headers=self.headers, verify=self.verify)
+        authenticatedSession.post(self.url_prefix + '/logincheck', headers=self.headers, verify=self.verify)
         self.cookies = authenticatedSession.cookies
-
-        altAuth = requests.post(self.url_prefix + '/logincheck',data=unpw, headers=self.headers, verify=self.verify)
-        self.cookies = altAuth.cookies
 
         for cookie in self.cookies:
             if cookie.name == "ccsrftoken":
@@ -62,28 +58,32 @@ class FortiGateAPI:
         return self
 
     def __del__(self):
-        if self._secure:
-            http='https://'
-        else:
-            http='http://'
         try:
-            requests.post(http+self.ip+'/logout', verify=self.verify, cookies=self.cookies, proxies=self.proxies)
+            requests.post(self.url_prefix + '/logout', verify=self.verify, cookies=self.cookies, proxies=self.proxies)
         except AttributeError:
             print ("Looks like connection to "+self.ip+" has never been established")
-
-
 
     def __exit__(self, *args):
         pass
 
+    def login(self, username, password):
+        unpw = {'username': username, 'secretkey': password}
+
+        # Might need to use
+        # data='username=' + user + '&secretkey=' + password + '&ajax=1'
+
+        altAuth = requests.post(self.url_prefix + '/logincheck',data=unpw, headers=self.headers, verify=self.verify)
+        self.cookies = altAuth.cookies
+
+        for cookie in self.cookies:
+            if cookie.name == "ccsrftoken":
+                csrftoken = cookie.value[1:-1]  # token stored as a list
+                self.headers['X-CSRFTOKEN'] = csrftoken
+
     def get(self, path, api='v2', params=None):
         if isinstance(path, list):
             path = '/'.join(path) + '/'
-        if self._secure:
-            http='https://'
-        else:
-            http='http://'
-        return requests.get(http+self.ip+'/api/'+api+'/'+path, cookies=self.cookies, verify=self.verify, proxies=self.proxies, params=params)
+        return requests.get(self.url_prefix + '/api/' + api + '/' + path, cookies=self.cookies, verify=self.verify, proxies=self.proxies, params=params)
 
     def put(self, path, api='v2', params=None, data=None):
         if isinstance(path, list):
