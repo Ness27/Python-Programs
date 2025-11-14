@@ -4,7 +4,16 @@ Description: Creating a FortiGate API class.
 Author: Hunter R.
 Date: 2025-11-12
 """
-import requests
+import requests, logging, sys
+
+# ️ Configure logging
+logging.basicConfig(
+    format="%(asctime)s [%(levelname)s][APIFortinet.py] %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ],
+    level=logging.INFO
+)
 
 class FortiGateAPI:
     def __init__(self, ip, headers, verify=False, proxies=None, disable_warnings=True, secure=True):
