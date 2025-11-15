@@ -4,7 +4,7 @@ Description: Creating a FortiGate API class.
 Author: Hunter R.
 Date: 2025-11-12
 """
-import requests, logging, sys
+import requests, logging, sys, json
 
 # ️ Configure logging
 logging.basicConfig(
@@ -63,23 +63,31 @@ class FortiGateAPI:
         pass
 
     def login(self, username, password):
-        unpw = {'username': username, 'secretkey': password}
-
         # Might need to use
         # data='username=' + user + '&secretkey=' + password + '&ajax=1'
+        # ajax=1&username=here&secretkey=here%23
 
-        altAuth = requests.post(self.url_prefix + '/logincheck',data=unpw, headers=self.headers, verify=self.verify)
+        altAuth = requests.post(self.url_prefix + '/logincheck',data='ajax=1' + '&username=' + username + '&secretkey=' + password,
+                                headers=self.headers, verify=self.verify)
         self.cookies = altAuth.cookies
+        logging.info(f'Logged in and received cookies -> {altAuth.cookies.get_dict()}')
 
         for cookie in self.cookies:
-            if cookie.name == "ccsrftoken":
-                csrftoken = cookie.value[1:-1]  # token stored as a list
+            if "ccsrftoken" in cookie.name:
+                csrftoken = cookie.value
                 self.headers['X-CSRFTOKEN'] = csrftoken
+
+            # if cookie.name == "ccsrftoken_8443_fa108c59":
+            #    logging.info(f'Passed {cookie.name}')
+
+            # if cookie.name == "ccsrftoken":
+            #    csrftoken = cookie.value[1:-1]  # token stored as a list
+            #    self.headers['X-CSRFTOKEN'] = csrftoken
 
     def get(self, path, api='v2', params=None):
         if isinstance(path, list):
             path = '/'.join(path) + '/'
-        return requests.get(self.url_prefix + '/api/' + api + '/' + path, cookies=self.cookies, verify=self.verify, proxies=self.proxies, params=params)
+        return requests.get(self.url_prefix + '/api/' + api + '/' + path, cookies=self.cookies, verify=self.verify, headers=self.headers, params=params)
 
     def put(self, path, api='v2', params=None, data=None):
         if isinstance(path, list):
@@ -90,7 +98,7 @@ class FortiGateAPI:
     def post(self, path, api='v2', params=None, data=None, files=None):
         if isinstance(path, list):
             path = '/'.join(path) + '/'
-        return requests.post(self.url_prefix + '/api/'+api+'/'+path, headers=self.header,cookies=self.cookies,
+        return requests.post(self.url_prefix + '/api/'+api+'/'+path, headers=self.headers,cookies=self.cookies,
                             verify=self.verify, proxies=self.proxies, params=params, json={'json': data},
                             files=files)
 
@@ -100,10 +108,13 @@ class FortiGateAPI:
         return requests.delete(self.url_prefix + '/api/'+api+'/'+path, headers=self.header,cookies=self.cookies,
                             verify=self.verify, proxies=self.proxies, params=params, json={'json': data})
 
-    def print_data(self, response):
-        if response.status_code == 200:
-            print(response.text)
+    def print_data(self, data):
+        if data.status_code == 200:
+            parsed_data = json.loads(data.text)
+            output_data = json.dumps(parsed_data['results'], indent=4)
+            logging.info(output_data)
+            return output_data
         else:
-            print('Response Code -> {}\n'.format(response.status_code))
-
+            logging.info('Response Code -> {}\n'.format(data.status_code))
+            return None
 
