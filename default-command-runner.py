@@ -42,30 +42,21 @@ def connectSession(arguments, commands):
 
         connection.disconnect()
 
-    except ValueError as val:
-        logging.error('{}'.format(val))
-        logging.error("Skipping {}".format(str(val).split(' ')[0]))
-        return None
-    except TimeoutError:
-        logging.error("There was an error: {}".format("TimeoutError"))
-        logging.error("Skipping {}".format(arguments['host']))
-        return None
+    except (ValueError, TimeoutError, netmiko.exceptions.NetMikoTimeoutException) as err:
+        logging.error(f"Connection error: {err}")
     except KeyboardInterrupt:
-        logging.exception("User interrupt.")
-        logging.error("There was an error: {}".format("KeyboardInterrupt"))
-        logging.error("Exiting program.")
-        exit(1)
+        logging.error("User interrupt. Exiting program.")
+        sys.exit(1)
     except netmiko.exceptions.NetMikoTimeoutException as theError:
         logging.error("There was an error: {}".format(theError))
 
     return None
 
 def main():
-    startTime = time.perf_counter()
-    logging.info("Setup complete.")
-    logging.info("Starting main program...")
+    start_time = time.perf_counter()
+    logging.info("Starting program...")
     setupComplete = time.perf_counter()
-    logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-startTime,5)))
+    logging.info('Completed initialization in {} seconds.'.format(round(setupComplete-start_time,5)))
 
     # Core Logic Starts Here
     
@@ -85,7 +76,7 @@ def main():
 
     logging.info("Program finished. - Exiting program.")
     finalTime = time.perf_counter()
-    logging.info('Total running time: {} seconds.'.format(round(finalTime-startTime,5)))
+    logging.info('Total running time: {} seconds.'.format(round(finalTime-start_time,5)))
     logging.shutdown()
 
 if __name__ == "__main__":
